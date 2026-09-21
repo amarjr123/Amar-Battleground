@@ -2,73 +2,155 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
 <title>Amar Battleground v0.2</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+box-sizing:border-box;
+}
+
 html,body{
- margin:0;width:100%;height:100%;overflow:hidden;
- background:#111;font-family:Arial;touch-action:none
+margin:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:#111;
+font-family:Arial,sans-serif;
+touch-action:none;
 }
+
 canvas{
- width:100vw;height:100vh;display:block;
- background:#274325
+display:block;
+width:100vw;
+height:100vh;
+background:#274325;
 }
+
 #hud{
- position:fixed;top:10px;left:12px;color:#fff;
- font-weight:bold;text-shadow:2px 2px 3px #000;
- z-index:3;font-size:17px
+position:fixed;
+top:10px;
+left:12px;
+color:white;
+font-weight:bold;
+font-size:17px;
+text-shadow:2px 2px 3px #000;
+z-index:3;
 }
+
 #help{
- position:fixed;bottom:8px;left:50%;
- transform:translateX(-50%);
- color:#fff;background:#0009;padding:6px 10px;
- border-radius:8px;font-size:13px;z-index:3
+position:fixed;
+bottom:8px;
+left:50%;
+transform:translateX(-50%);
+color:white;
+background:#0009;
+padding:7px 12px;
+border-radius:8px;
+font-size:13px;
+z-index:3;
 }
+
 #start{
- position:fixed;inset:0;display:grid;
- place-items:center;background:#000b;
- z-index:10;color:#fff
+position:fixed;
+inset:0;
+display:grid;
+place-items:center;
+background:#000b;
+z-index:10;
+color:white;
 }
+
 .panel{
- background:#182018;padding:28px;
- border-radius:16px;text-align:center
+background:#182018;
+padding:30px;
+border-radius:16px;
+text-align:center;
+box-shadow:0 10px 40px #000;
 }
+
+.panel h1{
+margin-top:0;
+}
+
 .panel button{
- font-size:18px;padding:12px 25px;
- border:0;border-radius:10px
+font-size:18px;
+padding:12px 25px;
+border:0;
+border-radius:10px;
+cursor:pointer;
 }
+
 #joy{
- position:fixed;left:24px;bottom:35px;
- width:130px;height:130px;
- border:3px solid #ffffff66;
- border-radius:50%;
- background:#ffffff18;
- z-index:5;display:none
+position:fixed;
+left:24px;
+bottom:35px;
+width:130px;
+height:130px;
+border:3px solid #ffffff66;
+border-radius:50%;
+background:#ffffff18;
+z-index:5;
+display:none;
 }
+
 #knob{
- position:absolute;left:40px;top:40px;
- width:50px;height:50px;border-radius:50%;
- background:#ffffff77
+position:absolute;
+left:40px;
+top:40px;
+width:50px;
+height:50px;
+border-radius:50%;
+background:#ffffff77;
 }
+
 #fire{
- position:fixed;right:30px;bottom:45px;
- width:90px;height:90px;border-radius:50%;
- border:3px solid #fff9;background:#d33b3baa;
- color:#fff;font-weight:bold;font-size:18px;
- z-index:5;display:none
+position:fixed;
+right:30px;
+bottom:45px;
+width:90px;
+height:90px;
+border-radius:50%;
+border:3px solid #fff9;
+background:#d33b3baa;
+color:white;
+font-weight:bold;
+font-size:18px;
+z-index:5;
+display:none;
 }
+
 #reload{
- position:fixed;right:140px;bottom:55px;
- border:2px solid #fff8;border-radius:12px;
- background:#0008;color:#fff;padding:12px;
- z-index:5;display:none
+position:fixed;
+right:140px;
+bottom:55px;
+border:2px solid #fff8;
+border-radius:12px;
+background:#0008;
+color:white;
+padding:12px;
+z-index:5;
+display:none;
 }
+
 @media(max-width:700px){
- #joy,#fire,#reload{display:block}
- #help{display:none}
+
+#joy,
+#fire,
+#reload{
+display:block;
 }
+
+#help{
+display:none;
+}
+
+}
+
 </style>
 </head>
 
@@ -77,13 +159,24 @@ canvas{
 <canvas id="game"></canvas>
 
 <div id="hud">
-HP: <span id="hp">100</span> |
-Enemies: <span id="enemies">8</span> |
-Ammo: <span id="ammo">30</span>
+
+HP:
+<span id="hp">100</span>
+
+|
+
+Enemies:
+<span id="enemies">8</span>
+
+|
+
+Ammo:
+<span id="ammo">30</span>
+
 </div>
 
 <div id="help">
-WASD / joystick = move · Mouse = aim · Click/FIRE = shoot · R = reload
+WASD = Move | Mouse = Aim | Click = Shoot | R = Reload
 </div>
 
 <div id="joy">
@@ -91,767 +184,1234 @@ WASD / joystick = move · Mouse = aim · Click/FIRE = shoot · R = reload
 </div>
 
 <button id="fire">FIRE</button>
+
 <button id="reload">RELOAD</button>
 
 <div id="start">
+
 <div class="panel">
+
 <h1>AMAR BATTLEGROUND</h1>
+
 <p>Version 0.2 — Mobile Prototype</p>
-<button id="startBtn">START GAME</button>
+
+<button id="startBtn">
+START GAME
+</button>
+
 </div>
+
 </div>
+
 
 <script>
 
-const c=document.getElementById("game");
-const ctx=c.getContext("2d");
+/* =========================
+   CANVAS
+========================= */
 
-let W,H;
+const canvas =
+document.getElementById("game");
+
+const ctx =
+canvas.getContext("2d");
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+
+canvas.width = W;
+canvas.height = H;
+
+
+/* =========================
+   RESIZE
+========================= */
 
 function resize(){
- W=c.width=innerWidth;
- H=c.height=innerHeight;
+
+W = window.innerWidth;
+H = window.innerHeight;
+
+canvas.width = W;
+canvas.height = H;
+
 }
 
-resize();
-addEventListener("resize",resize);
+window.addEventListener(
+"resize",
+resize
+);
 
-let keys={};
 
-let mouse={
- x:W/2,
- y:H/2,
- down:false
+/* =========================
+   PLAYER
+   IMPORTANT:
+   Player is created BEFORE draw()
+========================= */
+
+let player = {
+
+x: W / 2,
+
+y: H / 2,
+
+r: 18,
+
+hp: 100,
+
+speed: 3.2
+
 };
 
-let running=false;
-let over=false;
 
-let player;
-let enemies=[];
-let bullets=[];
-let enemyBullets=[];
+/* =========================
+   GAME VARIABLES
+========================= */
 
-let ammo=30;
-let lastShot=0;
+let enemies = [];
 
-let joyX=0;
-let joyY=0;
+let bullets = [];
 
-const hpEl=document.getElementById("hp");
-const enemiesEl=document.getElementById("enemies");
-const ammoEl=document.getElementById("ammo");
+let enemyBullets = [];
 
+let ammo = 30;
 
-/* KEYBOARD */
+let running = false;
 
-addEventListener("keydown",e=>{
+let gameOver = false;
 
- keys[e.key.toLowerCase()]=true;
+let lastShot = 0;
 
- if(e.key.toLowerCase()==="r")
-   ammo=30;
+let keys = {};
 
- if(e.key==="Enter" && over)
-   reset();
+let joystickX = 0;
 
-});
+let joystickY = 0;
 
-addEventListener("keyup",e=>{
- keys[e.key.toLowerCase()]=false;
-});
+let mouse = {
+
+x: W / 2,
+
+y: H / 2,
+
+down: false
+
+};
 
 
-/* MOUSE */
+/* =========================
+   HUD
+========================= */
 
-c.addEventListener("mousemove",e=>{
- mouse.x=e.clientX;
- mouse.y=e.clientY;
-});
+const hpElement =
+document.getElementById("hp");
 
-c.addEventListener("mousedown",()=>{
- mouse.down=true;
-});
+const enemyElement =
+document.getElementById("enemies");
 
-addEventListener("mouseup",()=>{
- mouse.down=false;
-});
+const ammoElement =
+document.getElementById("ammo");
 
-
-/* RESET GAME */
-
-function reset(){
-
- player={
-   x:W/2,
-   y:H/2,
-   r:18,
-   hp:100,
-   speed:3.2
- };
-
- enemies=[];
- bullets=[];
- enemyBullets=[];
-
- ammo=30;
- over=false;
-
- for(let i=0;i<8;i++){
-
-   let e;
-
-   do{
-
-     e={
-       x:50+Math.random()*(W-100),
-       y:80+Math.random()*(H-130),
-       r:17,
-       hp:60,
-       speed:1.1
-     };
-
-   }while(
-     Math.hypot(
-       e.x-player.x,
-       e.y-player.y
-     )<180
-   );
-
-   enemies.push(e);
- }
-
- updateHUD();
-}
-
-
-/* HUD */
 
 function updateHUD(){
 
- hpEl.textContent=Math.max(
-   0,
-   Math.ceil(player.hp)
- );
+hpElement.textContent =
+Math.max(
+0,
+Math.ceil(player.hp)
+);
 
- enemiesEl.textContent=enemies.length;
+enemyElement.textContent =
+enemies.length;
 
- ammoEl.textContent=ammo;
+ammoElement.textContent =
+ammo;
+
 }
+
+
+/* =========================
+   KEYBOARD
+========================= */
+
+window.addEventListener(
+"keydown",
+function(e){
+
+keys[e.key.toLowerCase()] = true;
+
+
+/* Reload */
+
+if(
+e.key.toLowerCase() === "r"
+){
+
+ammo = 30;
+
+}
+
+
+/* Restart */
+
+if(
+e.key === "Enter" &&
+gameOver
+){
+
+resetGame();
+
+}
+
+});
+
+
+window.addEventListener(
+"keyup",
+function(e){
+
+keys[e.key.toLowerCase()] = false;
+
+});
+
+
+/* =========================
+   MOUSE
+========================= */
+
+canvas.addEventListener(
+"mousemove",
+function(e){
+
+mouse.x = e.clientX;
+
+mouse.y = e.clientY;
+
+});
+
+
+canvas.addEventListener(
+"mousedown",
+function(){
+
+mouse.down = true;
+
+});
+
+
+window.addEventListener(
+"mouseup",
+function(){
+
+mouse.down = false;
+
+});
+
+
+/* =========================
+   CREATE ENEMIES
+========================= */
+
+function createEnemies(){
+
+enemies = [];
+
+for(
+let i = 0;
+i < 8;
+i++
+){
+
+let enemy;
+
+do{
+
+enemy = {
+
+x:
+50 +
+Math.random() *
+(W - 100),
+
+y:
+80 +
+Math.random() *
+(H - 140),
+
+r: 17,
+
+hp: 60,
+
+speed: 1.1
+
+};
+
+}
+while(
+
+Math.hypot(
+enemy.x - player.x,
+enemy.y - player.y
+) < 180
+
+);
+
+enemies.push(enemy);
+
+}
+
+}
+
+
+/* =========================
+   RESET GAME
+========================= */
+
+function resetGame(){
+
+player = {
+
+x: W / 2,
+
+y: H / 2,
+
+r: 18,
+
+hp: 100,
+
+speed: 3.2
+
+};
+
+bullets = [];
+
+enemyBullets = [];
+
+ammo = 30;
+
+gameOver = false;
+
+createEnemies();
+
+updateHUD();
+
+}
+
+
+/* =========================
+   START GAME
+========================= */
+
+document
+.getElementById("startBtn")
+.addEventListener(
+"click",
+function(){
+
+document
+.getElementById("start")
+.style.display = "none";
+
+running = true;
+
+resetGame();
+
+}
+);
+
+
+/* =========================
+   SHOOT
+========================= */
+
+function shoot(){
+
+if(
+!running ||
+gameOver ||
+ammo <= 0
+){
+
+return;
+
+}
+
+const now =
+performance.now();
+
+
+if(
+now - lastShot < 170
+){
+
+return;
+
+}
+
+lastShot = now;
+
+ammo--;
+
+
+const angle =
+Math.atan2(
+mouse.y - player.y,
+mouse.x - player.x
+);
+
+
+bullets.push({
+
+x: player.x,
+
+y: player.y,
+
+vx:
+Math.cos(angle) * 10,
+
+vy:
+Math.sin(angle) * 10
+
+});
+
+}
+
+
+/* =========================
+   COLLISION
+========================= */
+
+function collision(a,b){
+
+return Math.hypot(
+a.x - b.x,
+a.y - b.y
+)
+<
+a.r + b.r;
+
+}
+
+
+/* =========================
+   UPDATE GAME
+========================= */
+
+function update(){
+
+if(
+!running ||
+gameOver
+){
+
+return;
+
+}
+
+
+/* PLAYER MOVEMENT */
+
+let dx =
+(keys.d ? 1 : 0) -
+(keys.a ? 1 : 0) +
+joystickX;
+
+let dy =
+(keys.s ? 1 : 0) -
+(keys.w ? 1 : 0) +
+joystickY;
+
+
+const length =
+Math.hypot(dx,dy);
+
+
+if(length > 1){
+
+dx /= length;
+dy /= length;
+
+}
+
+
+player.x +=
+dx * player.speed;
+
+player.y +=
+dy * player.speed;
+
+
+/* MAP LIMIT */
+
+player.x =
+Math.max(
+22,
+Math.min(
+W - 22,
+player.x
+)
+);
+
+player.y =
+Math.max(
+50,
+Math.min(
+H - 22,
+player.y
+)
+);
 
 
 /* SHOOT */
 
-function shoot(){
+if(mouse.down){
 
- if(!running || over || ammo<=0)
-   return;
-
- let now=performance.now();
-
- if(now-lastShot<170)
-   return;
-
- lastShot=now;
-
- ammo--;
-
- let angle=Math.atan2(
-   mouse.y-player.y,
-   mouse.x-player.x
- );
-
- bullets.push({
-
-   x:player.x,
-   y:player.y,
-
-   vx:Math.cos(angle)*10,
-   vy:Math.sin(angle)*10
-
- });
-}
-
-
-/* COLLISION */
-
-function hit(a,b){
-
- return Math.hypot(
-   a.x-b.x,
-   a.y-b.y
- ) < a.r+b.r;
+shoot();
 
 }
 
 
-/* UPDATE */
+/* PLAYER BULLETS */
 
-function update(){
+for(
+const bullet of bullets
+){
 
- if(!running || over)
-   return;
+bullet.x += bullet.vx;
 
-
- /* MOVEMENT */
-
- let dx=
-   (keys.d?1:0)-
-   (keys.a?1:0)+joyX;
-
- let dy=
-   (keys.s?1:0)-
-   (keys.w?1:0)+joyY;
-
- let distance=Math.hypot(dx,dy);
-
- if(distance>1){
-
-   dx/=distance;
-   dy/=distance;
-
- }
-
- player.x+=dx*player.speed;
- player.y+=dy*player.speed;
-
- player.x=Math.max(
-   22,
-   Math.min(W-22,player.x)
- );
-
- player.y=Math.max(
-   50,
-   Math.min(H-22,player.y)
- );
-
-
- /* AUTO SHOOT */
-
- if(mouse.down)
-   shoot();
-
-
- /* PLAYER BULLETS */
-
- bullets.forEach(b=>{
-
-   b.x+=b.vx;
-   b.y+=b.vy;
-
- });
-
- bullets=bullets.filter(b=>
-   b.x>-30 &&
-   b.x<W+30 &&
-   b.y>-30 &&
-   b.y<H+30
- );
-
-
- /* ENEMIES */
-
- for(const e of enemies){
-
-   let angle=Math.atan2(
-     player.y-e.y,
-     player.x-e.x
-   );
-
-   let distance=Math.hypot(
-     player.x-e.x,
-     player.y-e.y
-   );
-
-   if(distance>90){
-
-     e.x+=Math.cos(angle)*e.speed;
-     e.y+=Math.sin(angle)*e.speed;
-
-   }else{
-
-     player.hp-=0.08;
-
-   }
-
- }
-
-
- /* ENEMY SHOOT */
-
- if(Math.random()<0.025){
-
-   enemies.forEach(e=>{
-
-     let angle=Math.atan2(
-       player.y-e.y,
-       player.x-e.x
-     );
-
-     enemyBullets.push({
-
-       x:e.x,
-       y:e.y,
-
-       vx:Math.cos(angle)*4,
-       vy:Math.sin(angle)*4,
-
-       r:4
-
-     });
-
-   });
-
- }
-
-
- /* ENEMY BULLETS */
-
- enemyBullets.forEach(b=>{
-
-   b.x+=b.vx;
-   b.y+=b.vy;
-
-   if(hit(b,player)){
-
-     player.hp-=7;
-
-     b.x=-999;
-
-   }
-
- });
-
-
- /* BULLET HIT */
-
- for(const b of bullets){
-
-   for(const e of enemies){
-
-     if(e.hp>0 && hit(b,e)){
-
-       e.hp-=30;
-
-       b.x=-999;
-
-     }
-
-   }
-
- }
-
-
- enemies=enemies.filter(e=>e.hp>0);
-
-
- /* GAME END */
-
- if(player.hp<=0){
-
-   player.hp=0;
-   over=true;
-
- }
-
- if(enemies.length===0){
-
-   over=true;
-
- }
-
- updateHUD();
+bullet.y += bullet.vy;
 
 }
 
 
-/* DRAW */
+bullets =
+bullets.filter(
+bullet =>
+
+bullet.x > -30 &&
+bullet.x < W + 30 &&
+bullet.y > -30 &&
+bullet.y < H + 30
+
+);
+
+
+/* ENEMIES */
+
+for(
+const enemy of enemies
+){
+
+const angle =
+Math.atan2(
+player.y - enemy.y,
+player.x - enemy.x
+);
+
+const distance =
+Math.hypot(
+player.x - enemy.x,
+player.y - enemy.y
+);
+
+
+if(
+distance > 90
+){
+
+enemy.x +=
+Math.cos(angle) *
+enemy.speed;
+
+enemy.y +=
+Math.sin(angle) *
+enemy.speed;
+
+}
+else{
+
+player.hp -= 0.08;
+
+}
+
+}
+
+
+/* ENEMY SHOOT */
+
+if(
+Math.random() < 0.025
+){
+
+for(
+const enemy of enemies
+){
+
+const angle =
+Math.atan2(
+player.y - enemy.y,
+player.x - enemy.x
+);
+
+enemyBullets.push({
+
+x: enemy.x,
+
+y: enemy.y,
+
+vx:
+Math.cos(angle) * 4,
+
+vy:
+Math.sin(angle) * 4,
+
+r: 4
+
+});
+
+}
+
+}
+
+
+/* ENEMY BULLETS */
+
+for(
+const bullet of enemyBullets
+){
+
+bullet.x += bullet.vx;
+
+bullet.y += bullet.vy;
+
+
+if(
+collision(
+bullet,
+player
+)
+){
+
+player.hp -= 7;
+
+bullet.x = -999;
+
+}
+
+}
+
+
+/* PLAYER HITS ENEMIES */
+
+for(
+const bullet of bullets
+){
+
+for(
+const enemy of enemies
+){
+
+if(
+enemy.hp > 0 &&
+collision(
+bullet,
+enemy
+)
+){
+
+enemy.hp -= 30;
+
+bullet.x = -999;
+
+}
+
+}
+
+}
+
+
+/* REMOVE DEAD ENEMIES */
+
+enemies =
+enemies.filter(
+enemy =>
+enemy.hp > 0
+);
+
+
+/* GAME OVER */
+
+if(
+player.hp <= 0
+){
+
+player.hp = 0;
+
+gameOver = true;
+
+}
+
+
+/* VICTORY */
+
+if(
+enemies.length === 0
+){
+
+gameOver = true;
+
+}
+
+
+updateHUD();
+
+}
+
+
+/* =========================
+   DRAW
+========================= */
 
 function draw(){
 
- ctx.clearRect(0,0,W,H);
+/* BACKGROUND */
 
+ctx.clearRect(
+0,
+0,
+W,
+H
+);
 
- /* MAP */
+ctx.fillStyle =
+"#31552f";
 
- ctx.fillStyle="#31552f";
+ctx.fillRect(
+0,
+0,
+W,
+H
+);
 
- ctx.fillRect(
-   0,0,W,H
- );
 
+/* GRID */
 
- /* GRID */
+ctx.strokeStyle =
+"#ffffff10";
 
- ctx.strokeStyle="#ffffff10";
+ctx.lineWidth = 1;
 
- for(let x=0;x<W;x+=50){
 
-   ctx.beginPath();
-   ctx.moveTo(x,45);
-   ctx.lineTo(x,H);
-   ctx.stroke();
+for(
+let x = 0;
+x < W;
+x += 50
+){
 
- }
+ctx.beginPath();
 
- for(let y=50;y<H;y+=50){
+ctx.moveTo(
+x,
+45
+);
 
-   ctx.beginPath();
-   ctx.moveTo(0,y);
-   ctx.lineTo(W,y);
-   ctx.stroke();
+ctx.lineTo(
+x,
+H
+);
 
- }
-
-
- /* SAFE ZONE */
-
- ctx.strokeStyle="#62cfff";
- ctx.lineWidth=4;
-
- ctx.beginPath();
-
- ctx.arc(
-   W/2,
-   (H+45)/2,
-   Math.min(W,H)*.38,
-   0,
-   Math.PI*2
- );
-
- ctx.stroke();
-
-
- /* ENEMIES */
-
- for(const e of enemies){
-
-   ctx.fillStyle="#d44";
-
-   ctx.beginPath();
-
-   ctx.arc(
-     e.x,
-     e.y,
-     e.r,
-     0,
-     Math.PI*2
-   );
-
-   ctx.fill();
-
-
-   /* HP BAR */
-
-   ctx.fillStyle="#222";
-
-   ctx.fillRect(
-     e.x-18,
-     e.y-27,
-     36,
-     5
-   );
-
-   ctx.fillStyle="#5d5";
-
-   ctx.fillRect(
-     e.x-18,
-     e.y-27,
-     36*e.hp/60,
-     5
-   );
-
- }
-
-
- /* PLAYER BULLETS */
-
- for(const b of bullets){
-
-   ctx.fillStyle="#ffd34d";
-
-   ctx.beginPath();
-
-   ctx.arc(
-     b.x,
-     b.y,
-     4,
-     0,
-     Math.PI*2
-   );
-
-   ctx.fill();
-
- }
-
-
- /* ENEMY BULLETS */
-
- for(const b of enemyBullets){
-
-   ctx.fillStyle="#ff754d";
-
-   ctx.beginPath();
-
-   ctx.arc(
-     b.x,
-     b.y,
-     b.r,
-     0,
-     Math.PI*2
-   );
-
-   ctx.fill();
-
- }
-
-
- /* PLAYER */
-
- let angle=Math.atan2(
-   mouse.y-player.y,
-   mouse.x-player.x
- );
-
- ctx.save();
-
- ctx.translate(
-   player.x,
-   player.y
- );
-
- ctx.rotate(angle);
-
- ctx.fillStyle="#3da7ff";
-
- ctx.beginPath();
-
- ctx.arc(
-   0,
-   0,
-   18,
-   0,
-   Math.PI*2
- );
-
- ctx.fill();
-
-
- /* GUN */
-
- ctx.fillStyle="#222";
-
- ctx.fillRect(
-   8,
-   -4,
-   28,
-   8
- );
-
- ctx.restore();
-
-
- /* GAME OVER */
-
- if(over){
-
-   ctx.fillStyle="#000b";
-
-   ctx.fillRect(
-     0,
-     0,
-     W,
-     H
-   );
-
-   ctx.fillStyle="#fff";
-
-   ctx.textAlign="center";
-
-   ctx.font="bold 44px Arial";
-
-   ctx.fillText(
-     enemies.length===0
-       ?"VICTORY"
-       :"YOU DIED",
-     W/2,
-     H/2-20
-   );
-
-   ctx.font="20px Arial";
-
-   ctx.fillText(
-     "Press ENTER to restart",
-     W/2,
-     H/2+25
-   );
-
- }
+ctx.stroke();
 
 }
 
 
-/* GAME LOOP */
+for(
+let y = 50;
+y < H;
+y += 50
+){
 
-function loop(){
+ctx.beginPath();
 
- update();
- draw();
-
- requestAnimationFrame(loop);
-
-}
-
-loop();
-
-
-/* START */
-
-document.getElementById("startBtn").onclick=()=>{
-
- document.getElementById(
-   "start"
- ).style.display="none";
-
- running=true;
-
- reset();
-
-};
-
-
-/* FIRE BUTTON */
-
-document.getElementById("fire")
-.onpointerdown=e=>{
-
- e.preventDefault();
-
- mouse.down=true;
-
- shoot();
-
-};
-
-document.getElementById("fire")
-.onpointerup=e=>{
-
- mouse.down=false;
-
-};
-
-
-/* RELOAD */
-
-document.getElementById("reload")
-.onpointerdown=()=>{
-
- ammo=30;
-
-};
-
-
-/* JOYSTICK */
-
-const joy=document.getElementById("joy");
-const knob=document.getElementById("knob");
-
-let joyId=null;
-
-joy.addEventListener(
- "pointerdown",
- e=>{
-
-   joyId=e.pointerId;
-
-   joy.setPointerCapture(
-     e.pointerId
-   );
-
-   moveJoy(e);
-
- }
+ctx.moveTo(
+0,
+y
 );
 
-joy.addEventListener(
- "pointermove",
- e=>{
-
-   if(e.pointerId===joyId)
-     moveJoy(e);
-
- }
+ctx.lineTo(
+W,
+y
 );
 
-joy.addEventListener(
- "pointerup",
- ()=>{
-
-   joyId=null;
-
-   joyX=0;
-   joyY=0;
-
-   knob.style.left="40px";
-   knob.style.top="40px";
-
- }
-);
-
-
-function moveJoy(e){
-
- let r=joy.getBoundingClientRect();
-
- let x=
-   e.clientX-
-   (r.left+r.width/2);
-
- let y=
-   e.clientY-
-   (r.top+r.height/2);
-
- let distance=Math.hypot(x,y);
-
- let max=40;
-
- if(distance>max){
-
-   x=x/distance*max;
-   y=y/distance*max;
-
- }
-
- joyX=x/max;
- joyY=y/max;
-
- knob.style.left=
-   (40+x)+"px";
-
- knob.style.top=
-   (40+y)+"px";
+ctx.stroke();
 
 }
 
 
-/* MOBILE AIM */
+/* SAFE ZONE */
 
-addEventListener(
- "pointermove",
- e=>{
+ctx.strokeStyle =
+"#62cfff";
 
-   if(
-     e.pointerType==="touch" &&
-     e.clientX>W/2
-   ){
+ctx.lineWidth = 4;
 
-     mouse.x=e.clientX;
-     mouse.y=e.clientY;
+ctx.beginPath();
 
-   }
+ctx.arc(
 
- }
+W / 2,
+
+(H + 45) / 2,
+
+Math.min(W,H) * 0.38,
+
+0,
+
+Math.PI * 2
+
 );
+
+ctx.stroke();
+
+
+/* ENEMIES */
+
+for(
+const enemy of enemies
+){
+
+/* body */
+
+ctx.fillStyle =
+"#d44";
+
+ctx.beginPath();
+
+ctx.arc(
+enemy.x,
+enemy.y,
+enemy.r,
+0,
+Math.PI * 2
+);
+
+ctx.fill();
+
+
+/* health background */
+
+ctx.fillStyle =
+"#222";
+
+ctx.fillRect(
+
+enemy.x - 18,
+
+enemy.y - 27,
+
+36,
+
+5
+
+);
+
+
+/* health */
+
+ctx.fillStyle =
+"#5d5";
+
+ctx.fillRect(
+
+enemy.x - 18,
+
+enemy.y - 27,
+
+36 * enemy.hp / 60,
+
+5
+
+);
+
+}
+
+
+/* BULLETS */
+
+for(
+const bullet of bullets
+){
+
+ctx.fillStyle =
+"#ffd34d";
+
+ctx.beginPath();
+
+ctx.arc(
+bullet.x,
+bullet.y,
+4,
+0,
+Math.PI * 2
+);
+
+ctx.fill();
+
+}
+
+
+/* ENEMY BULLETS */
+
+for(
+const bullet of enemyBullets
+){
+
+ctx.fillStyle =
+"#ff754d";
+
+ctx.beginPath();
+
+ctx.arc(
+bullet.x,
+bullet.y,
+bullet.r,
+0,
+Math.PI * 2
+);
+
+ctx.fill();
+
+}
+
+
+/* PLAYER AIM */
+
+const angle =
+Math.atan2(
+mouse.y - player.y,
+mouse.x - player.x
+);
+
+
+/* PLAYER */
+
+ctx.save();
+
+ctx.translate(
+player.x,
+player.y
+);
+
+ctx.rotate(angle);
+
+
+/* BODY */
+
+ctx.fillStyle =
+"#3da7ff";
+
+ctx.beginPath();
+
+ctx.arc(
+0,
+0,
+18,
+0,
+Math.PI * 2
+);
+
+ctx.fill();
+
+
+/* GUN */
+
+ctx.fillStyle =
+"#222";
+
+ctx.fillRect(
+8,
+-4,
+28,
+8
+);
+
+ctx.restore();
+
+
+/* GAME OVER SCREEN */
+
+if(gameOver){
+
+ctx.fillStyle =
+"#000b";
+
+ctx.fillRect(
+0,
+0,
+W,
+H
+);
+
+ctx.fillStyle =
+"#fff";
+
+ctx.textAlign =
+"center";
+
+ctx.font =
+"bold 44px Arial";
+
+
+if(
+enemies.length === 0
+){
+
+ctx.fillText(
+"VICTORY",
+W / 2,
+H / 2 - 20
+);
+
+}
+else{
+
+ctx.fillText(
+"YOU DIED",
+W / 2,
+H / 2 - 20
+);
+
+}
+
+
+ctx.font =
+"20px Arial";
+
+ctx.fillText(
+"Press ENTER to restart",
+W / 2,
+H / 2 + 25
+);
+
+}
+
+}
+
+
+/* =========================
+   GAME LOOP
+========================= */
+
+function gameLoop(){
+
+update();
+
+draw();
+
+requestAnimationFrame(
+gameLoop
+);
+
+}
+
+
+/* START LOOP */
+
+gameLoop();
+
+
+/* =========================
+   FIRE BUTTON
+========================= */
+
+const fireButton =
+document.getElementById("fire");
+
+
+fireButton.addEventListener(
+"pointerdown",
+function(e){
+
+e.preventDefault();
+
+mouse.down = true;
+
+shoot();
+
+});
+
+
+fireButton.addEventListener(
+"pointerup",
+function(e){
+
+e.preventDefault();
+
+mouse.down = false;
+
+});
+
+
+/* =========================
+   RELOAD BUTTON
+========================= */
+
+document
+.getElementById("reload")
+.addEventListener(
+"pointerdown",
+function(){
+
+ammo = 30;
+
+updateHUD();
+
+}
+);
+
+
+/* =========================
+   JOYSTICK
+========================= */
+
+const joystick =
+document.getElementById("joy");
+
+const knob =
+document.getElementById("knob");
+
+let joystickPointer = null;
+
+
+joystick.addEventListener(
+"pointerdown",
+function(e){
+
+joystickPointer =
+e.pointerId;
+
+joystick.setPointerCapture(
+e.pointerId
+);
+
+moveJoystick(e);
+
+});
+
+
+joystick.addEventListener(
+"pointermove",
+function(e){
+
+if(
+e.pointerId === joystickPointer
+){
+
+moveJoystick(e);
+
+}
+
+});
+
+
+joystick.addEventListener(
+"pointerup",
+function(){
+
+joystickPointer = null;
+
+joystickX = 0;
+
+joystickY = 0;
+
+knob.style.left =
+"40px";
+
+knob.style.top =
+"40px";
+
+});
+
+
+function moveJoystick(e){
+
+const rect =
+joystick.getBoundingClientRect();
+
+
+let x =
+e.clientX -
+(
+rect.left +
+rect.width / 2
+);
+
+
+let y =
+e.clientY -
+(
+rect.top +
+rect.height / 2
+);
+
+
+const max = 40;
+
+const distance =
+Math.hypot(x,y);
+
+
+if(
+distance > max
+){
+
+x =
+x / distance * max;
+
+y =
+y / distance * max;
+
+}
+
+
+joystickX =
+x / max;
+
+joystickY =
+y / max;
+
+
+knob.style.left =
+(40 + x) + "px";
+
+knob.style.top =
+(40 + y) + "px";
+
+}
+
+
+/* =========================
+   MOBILE AIM
+========================= */
+
+window.addEventListener(
+"pointermove",
+function(e){
+
+if(
+e.pointerType === "touch" &&
+e.clientX > W / 2
+){
+
+mouse.x =
+e.clientX;
+
+mouse.y =
+e.clientY;
+
+}
+
+});
 
 </script>
 
