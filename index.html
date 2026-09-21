@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Amar Battleground</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;font-family:Arial,sans-serif}
+canvas{display:block;width:100vw;height:100vh;background:#263b25}
+#hud{position:fixed;left:15px;top:12px;color:#fff;font-weight:bold;font-size:18px;text-shadow:2px 2px 3px #000;z-index:2}
+#help{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);color:#fff;background:#0009;padding:8px 12px;border-radius:8px;font-size:14px;z-index:2}
+#start{position:fixed;inset:0;display:grid;place-items:center;background:#000b;z-index:5;color:white}
+.panel{background:#182018;padding:30px;border-radius:16px;text-align:center;box-shadow:0 10px 40px #000}
+button{font-size:18px;padding:12px 24px;border:0;border-radius:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">HP: <span id="hp">100</span> | Enemies: <span id="enemies">8</span> | Ammo: <span id="ammo">30</span></div>
+<div id="help">WASD = move · Mouse = aim · Click = shoot · R = reload</div>
+<div id="start"><div class="panel"><h1>AMAR BATTLEGROUND</h1><p>Version 0.1 — Prototype</p><button id="startBtn">START GAME</button></div></div>
+<script>
+const c=document.getElementById('game'),ctx=c.getContext('2d');
+let W,H,keys={},mouse={x:0,y:0,down:false},running=false,gameOver=false;
+let player,enemies=[],bullets=[],enemyBullets=[],ammo=30,lastShot=0,lastEnemyShot=0;
+function resize(){W=c.width=innerWidth;H=c.height=innerHeight} addEventListener('resize',resize);resize();
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key.toLowerCase()==='r')ammo=30});
+addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+c.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
+c.addEventListener('mousedown',()=>mouse.down=true);addEventListener('mouseup',()=>mouse.down=false);
+
+function reset(){
+ player={x:W/2,y:H/2,r:18,hp:100,speed:3};
+ enemies=[];bullets=[];enemyBullets=[];ammo=30;gameOver=false;
+ for(let i=0;i<8;i++){let e;do{e={x:60+Math.random()*(W-120),y:80+Math.random()*(H-140),r:16,hp:60,speed:1.15}}while(Math.hypot(e.x-player.x,e.y-player.y)<180);enemies.push(e)}
+ document.getElementById('hp').textContent=100;document.getElementById('enemies').textContent=8;document.getElementById('ammo').textContent=30;
+}
+function shoot(){
+ if(!running||gameOver||ammo<=0)return;
+ let now=performance.now();if(now-lastShot<180)return;lastShot=now;ammo--;
+ let a=Math.atan2(mouse.y-player.y,mouse.x-player.x);
+ bullets.push({x:player.x,y:player.y,vx:Math.cos(a)*9,vy:Math.sin(a)*9});
+}
+function circleHit(a,b){return Math.hypot(a.x-b.x,a.y-b.y)<a.r+b.r}
+function update(){
+ if(!running||gameOver)return;
+ let dx=(keys.d?1:0)-(keys.a?1:0),dy=(keys.s?1:0)-(keys.w?1:0);
+ let n=Math.hypot(dx,dy)||1;player.x+=dx/n*player.speed;player.y+=dy/n*player.speed;
+ player.x=Math.max(25,Math.min(W-25,player.x));player.y=Math.max(55,Math.min(H-25,player.y));
+ if(mouse.down)shoot();
+ bullets.forEach(b=>{b.x+=b.vx;b.y+=b.vy});
+ bullets=bullets.filter(b=>b.x>-20&&b.x<W+20&&b.y>-20&&b.y<H+20);
+ for(const e of enemies){
+   let a=Math.atan2(player.y-e.y,player.x-e.x),d=Math.hypot(player.x-e.x,player.y-e.y);
+   if(d>100){e.x+=Math.cos(a)*e.speed;e.y+=Math.sin(a)*e.speed}
+   if(d<55){player.hp-=0.12}
+ }
+ let now=performance.now();
+ if(now-lastEnemyShot>900){lastEnemyShot=now;
+   enemies.forEach(e=>{let a=Math.atan2(player.y-e.y,player.x-e.x);enemyBullets.push({x:e.x,y:e.y,vx:Math.cos(a)*4,vy:Math.sin(a)*4,r:4})})
+ }
+ enemyBullets.forEach(b=>{b.x+=b.vx;b.y+=b.vy;if(circleHit(b,player)){player.hp-=8;b.x=-999}});
+ for(const b of bullets)for(const e of enemies)if(e.hp>0&&circleHit(b,e)){e.hp-=30;b.x=-999}
+ enemies=enemies.filter(e=>e.hp>0);
+ if(player.hp<=0){player.hp=0;gameOver=true}
+ if(enemies.length===0){gameOver=true}
+ document.getElementById('hp').textContent=Math.max(0,Math.ceil(player.hp));
+ document.getElementById('enemies').textContent=enemies.length;
+ document.getElementById('ammo').textContent=ammo;
+}
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ ctx.fillStyle='#355c32';ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='#ffffff10';ctx.lineWidth=1;
+ for(let x=0;x<W;x+=50){ctx.beginPath();ctx.moveTo(x,45);ctx.lineTo(x,H);ctx.stroke()}
+ for(let y=50;y<H;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ // safe zone
+ ctx.strokeStyle='#70d6ff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(W/2,(H+45)/2,Math.min(W,H)*.38,0,Math.PI*2);ctx.stroke();
+ for(const e of enemies){
+   ctx.fillStyle='#d34b4b';ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#222';ctx.fillRect(e.x-18,e.y-27,36,5);ctx.fillStyle='#63d471';ctx.fillRect(e.x-18,e.y-27,36*(e.hp/60),5);
+ }
+ for(const b of bullets){ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(b.x,b.y,4,0,Math.PI*2);ctx.fill()}
+ for(const b of enemyBullets){ctx.fillStyle='#ff7b54';ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fill()}
+ if(player){
+   let a=Math.atan2(mouse.y-player.y,mouse.x-player.x);
+   ctx.save();ctx.translate(player.x,player.y);ctx.rotate(a);
+   ctx.fillStyle='#3fa7ff';ctx.beginPath();ctx.arc(0,0,player.r,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle='#222';ctx.fillRect(8,-4,25,8);ctx.restore();
+ }
+ if(gameOver){
+   ctx.fillStyle='#000b';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.textAlign='center';
+   ctx.font='bold 48px Arial';ctx.fillText(enemies.length===0?'VICTORY':'YOU DIED',W/2,H/2-20);
+   ctx.font='22px Arial';ctx.fillText('Press ENTER to play again',W/2,H/2+30);
+ }
+}
+addEventListener('keydown',e=>{if(e.key==='Enter'&&gameOver){reset();}});
+document.getElementById('startBtn').onclick=()=>{document.getElementById('start').style.display='none';running=true;reset()};
+function loop(){update();draw();requestAnimationFrame(loop)}loop();
+</script>
+</body>
+</html>
